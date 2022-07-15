@@ -20,6 +20,6 @@ services:
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test_pass
-      POSTGRES_DB: school
+      POSTGRES_DB: test
     ports:
       - "5432:5432"
