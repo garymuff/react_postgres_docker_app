@@ -110,6 +110,32 @@ app.post('/students/:id', async (req, res) => {
   } 
 });
 
+app.post('/students/:studentId/enroll', async (req, res) => {
+  const { studentId } = req.params;
+  const { classId } = req.body;
+
+  try {
+    const enrollment = await prisma.student.update({
+      where: {
+        id: parseInt(studentId),
+      },
+      data: {
+        classes: {
+          connect: {
+            id: parseInt(classId),
+          },
+        },
+      },
+    });
+
+    res.json(enrollment);
+  } catch (error) {
+    console.error('Error enrolling student:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
  
 app.post('/classes', async (req, res) => {
