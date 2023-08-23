@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 
 function ClassList() {
   const [classes, setClasses] = useState([]);
@@ -112,10 +111,6 @@ function ClassList() {
               <>
                 {classItem.name}
                 <button onClick={() => handleEditClass(classItem.id)}>Edit</button>
-                <Link to={`/view-students/${classItem.id}`}> 
-                  <button>View Students</button>
-                </Link>
-                
                 <button onClick={() => handleDeleteClass(classItem.id)}>Delete</button>
               </>
             )}

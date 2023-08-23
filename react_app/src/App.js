@@ -1,84 +1,57 @@
-import React, { useState, useEffect } from 'react';
+// App.js
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import StudentList from './StudentList';
+import ClassList from './ClassList';
+import ClassDetail from './ClassDetail';
+import StudentDetail from './StudentDetail';
 
-function StudentList() {
-  const [students, setStudents] = useState([]);
-  const [newStudentName, setNewStudentName] = useState('');
+const modes = {
+  STUDENT_LIST: 'studentList',
+  CLASS_LIST: 'classList',
+};
 
-  const fetchStudents = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/students'); // Replace with your server URL
-      const fetchedStudents = await response.json();
-      setStudents(fetchedStudents);
-    } catch (error) {
-      console.error('Error fetching students:', error);
-    }
-  };
+function AppWrapper() {
+    const [currentMode, setCurrentMode] = useState(modes.STUDENT_LIST);
+  
+    const handleTabClick = (mode) => {
+      setCurrentMode(mode);
+    };
+  
+    return (
+      <div>
+        <div className="tabs">
+          <button
+            className={currentMode === modes.STUDENT_LIST ? 'active' : ''}
+            onClick={() => handleTabClick(modes.STUDENT_LIST)}
+          >
+            Student List
+          </button>
+          <button
+            className={currentMode === modes.CLASS_LIST ? 'active' : ''}
+            onClick={() => handleTabClick(modes.CLASS_LIST)}
+          >
+            Class List
+          </button>
+        </div>
+        <div className="content">
+          {currentMode === modes.STUDENT_LIST && <StudentList />}
+          {currentMode === modes.CLASS_LIST && <ClassList />}
+        </div>
+      </div>
+    );
+  }
 
-  const handleCreateStudent = async () => {
-    if (newStudentName) {
-      try {
-        await fetch('http://localhost:3001/students', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name: newStudentName }),
-        });
-        setNewStudentName('');
-        // Refresh the student list
-        fetchStudents();
-      } catch (error) {
-        console.error('Error creating student:', error);
-      }
-    }
-  };
-
-  const handleDeleteStudent = async (studentId) => {
-    try {
-      await fetch(`http://localhost:3001/students/${studentId}`, {
-        method: 'DELETE',
-      });
-      // Refresh the student list
-      fetchStudents();
-    } catch (error) {
-      console.error('Error deleting student:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
+function App() {
   return (
-    <div className="App">
-      {/* Form to create a student */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleCreateStudent();
-        }}
-      >
-        <input
-          type="text"
-          value={newStudentName}
-          onChange={(e) => setNewStudentName(e.target.value)}
-          placeholder="Enter student name"
-        />
-        <button type="submit">Create Student</button>
-      </form>
-
-      {/* List of students with delete buttons */}
-      <ul>
-        {students.map((student) => (
-          <li key={student.id}>
-            {student.name}
-            <button onClick={() => handleDeleteStudent(student.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<AppWrapper />} />
+        <Route path="/view-classes/:studentId" element={<StudentDetail />} />
+        <Route path="/view-students/:classId" element={<ClassDetail />} />
+      </Routes>
+    </Router>
   );
 }
 
-export default StudentList;
-
+export default App;
