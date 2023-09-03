@@ -7,7 +7,7 @@ import StudentList from './StudentList';
 import ClassList from './ClassList';
 import ClassDetail from './ClassDetail';
 import StudentDetail from './StudentDetail';
-import './App.css'
+import './App.css'   
 
 
 // Different modes of the application, 
