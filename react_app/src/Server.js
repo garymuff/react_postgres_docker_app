@@ -1,21 +1,32 @@
-// server.js
+// Name: Rohan Chopra
+// Date: 8/23/23
+// This is the many server file that implements the prisma client to connect to the database and respond back
+// with all CRUD operations.
+// It implements RESTful APIs to manipulate students and classes.
+
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const cors = require('cors');
 
+
+// Create the Prisma Client and Express to make fetching and receiving from URLs easier
 const prisma = new PrismaClient();
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(cors());
 
 // Routes
+
+// Fetch all students
 app.get('/students', async (req, res) => {
   const students = await prisma.student.findMany();
   res.json(students);
 });
 
+// Fetch student by ID
+// use the findUnique to uniquely identify the student based on the constraint of the studentID
+// Return a JSON object containing id, name and classes. 
 app.get('/students/:id', async (req, res) => {
   const studentId = parseInt(req.params.id);
 
@@ -45,12 +56,16 @@ app.get('/students/:id', async (req, res) => {
 });
 
 
-
+// get all the classes 
 app.get('/classes', async (req, res) => {
   const classes = await prisma.class.findMany();
   res.json(classes);
 });
 
+// Find a class based off of the ID.
+// Use the findUnique to uniquely identify the 
+// class based on the constraint of the classId.
+// Return a JSON object containing id, name and students. 
 app.get('/classes/:id', async (req, res) => {
   const classId = parseInt(req.params.id);
 
@@ -79,8 +94,9 @@ app.get('/classes/:id', async (req, res) => {
   }
 });
 
+// CREATE OPERATIONS
 
-
+// CREATE A STUDENT
 app.post('/students', async (req, res) => {
   const { name } = req.body;
   const createdStudent = await prisma.student.create({
@@ -92,6 +108,10 @@ app.post('/students', async (req, res) => {
 });
 
 
+// This will be called when the edit function is called in the front end
+// It will perform an update to a student based on the ID 
+// if the request has a update parameter set to true.
+// It will change the name data for the particular student.
 app.post('/students/:id', async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
@@ -109,6 +129,9 @@ app.post('/students/:id', async (req, res) => {
     res.json({ message: 'Student updated successfully' });
   } 
 });
+
+// Enroll a student in a class
+// Modifies the _classToStudent Table in the database.
 
 app.post('/students/:studentId/enroll', async (req, res) => {
   const { studentId } = req.params;
@@ -136,8 +159,38 @@ app.post('/students/:studentId/enroll', async (req, res) => {
 });
 
 
+//Drop a class from a students class list
+//Disconnect deletes the corresponding row from the _classToStudent table.
 
- 
+app.post('/students/:studentId/drop', async (req, res) => {
+  const { studentId } = req.params;
+  const { classId } = req.body;
+
+  try {
+    const dropResult = await prisma.student.update({
+      where: {
+        id: parseInt(studentId),
+      },
+      data: {
+        classes: {
+          disconnect: {
+            id: parseInt(classId),
+          },
+        },
+      },
+    });
+
+    res.json(dropResult);
+  } catch (error) {
+    console.error('Error dropping class:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+// Create a class
 app.post('/classes', async (req, res) => {
   const { name } = req.body;
   const createdClass = await prisma.class.create({
@@ -148,8 +201,8 @@ app.post('/classes', async (req, res) => {
   res.json(createdClass);
 });
  
-// ...
-
+// Update class name for the given id
+// When the query parameter update = true.
 app.post('/classes/:id', async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
@@ -168,9 +221,8 @@ app.post('/classes/:id', async (req, res) => {
   } 
 });
 
-// ...
 
-
+// Delete a student given the id 
 app.delete('/students/:id', async (req, res) => {
   const studentId = parseInt(req.params.id);
   await prisma.student.delete({
@@ -181,6 +233,7 @@ app.delete('/students/:id', async (req, res) => {
   res.json({ message: 'Student deleted successfully' });
 });
 
+// Delete a class given the classID
 app.delete('/classes/:id', async (req, res) => {
   const classId = parseInt(req.params.id);
   await prisma.class.delete({

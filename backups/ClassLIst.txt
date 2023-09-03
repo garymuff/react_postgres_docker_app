@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
+import { Link } from 'react-router-dom';
+import './ClassList.css';
 function ClassList() {
   const [classes, setClasses] = useState([]);
   const [newClassName, setNewClassName] = useState('');
@@ -74,51 +75,59 @@ function ClassList() {
     fetchClasses();
   }, []);
 
-  return (
-    <div className="ClassList">
-      <h2>Classes:</h2>
-      {/* Form to create a class */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleCreateClass();
-        }}
-      >
-        <input
-          type="text"
-          value={newClassName}
-          onChange={(e) => setNewClassName(e.target.value)}
-          placeholder="Enter class name"
-        />
-        <button type="submit">Create Class</button>
-      </form>
-
-      {/* List of classes with edit, save, and delete buttons */}
-      <ul>
-        {classes.map((classItem) => (
-          <li key={classItem.id}>
-            {editingClassId === classItem.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editedClassName}
-                  onChange={(e) => setEditedClassName(e.target.value)}
-                />
-                <button onClick={() => handleSaveEdit(classItem.id)}>Save</button>
-                <button onClick={() => setEditingClassId(null)}>Cancel</button>
-              </>
-            ) : (
-              <>
-                {classItem.name}
-                <button onClick={() => handleEditClass(classItem.id)}>Edit</button>
-                <button onClick={() => handleDeleteClass(classItem.id)}>Delete</button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  
+    return (
+      <div className="ClassList">
+        <h2>Classes:</h2>
+        <form className="create-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreateClass();
+          }}
+        >
+          <input
+            type="text"
+            value={newClassName}
+            onChange={(e) => setNewClassName(e.target.value)}
+            placeholder="Enter class name"
+            className="input-field"
+          />
+          <button type="submit" className="create-button">Create Class</button>
+        </form>
+  
+        <ul className="class-list">
+          {classes.map((classItem) => (
+            <li key={classItem.id} className="class-item">
+              {editingClassId === classItem.id ? (
+                <>
+                  <input
+                    type="text"
+                    value={editedClassName}
+                    onChange={(e) => setEditedClassName(e.target.value)}
+                    className="edit-input"
+                  />
+                  <button onClick={() => handleSaveEdit(classItem.id)} className="save-button">Save</button>
+                  <button onClick={() => setEditingClassId(null)} className="cancel-button">Cancel</button>
+                </>
+              ) : (
+                <>
+                <div className="class-info">
+                  <span className="class-name">{classItem.name}</span>
+                  <div className="class-actions">
+                  <button onClick={() => handleEditClass(classItem.id)} className="edit-button">Edit</button>
+                  <button onClick={() => handleDeleteClass(classItem.id)} className="delete-button">Delete</button>
+                  <Link to={`/view-students/${classItem.id}`} className="view-button">
+                    View Students
+                  </Link>
+                 </div>
+                 </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
 }
 
 export default ClassList;
