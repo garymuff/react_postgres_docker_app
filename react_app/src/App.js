@@ -13,7 +13,7 @@ import './App.css'
 // Different modes of the application, 
 const modes = {
   STUDENT_LIST: 'studentList',
-  CLASS_LIST: 'classList',
+  CLASS_LIST: 'classList', 
 };
 
 // Main component to wrap the entire application
