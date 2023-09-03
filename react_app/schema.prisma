@@ -16,3 +16,4 @@ model Class {
   name     String
   students Student[]
 }
+
