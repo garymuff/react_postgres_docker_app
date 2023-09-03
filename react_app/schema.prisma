@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://test:test_pass@localhost:5432/test"
+}
+model Student {
+  id       Int       @id @default(autoincrement())
+  name     String
+  classes  Class[]
+}
+
+model Class {
+  id       Int       @id @default(autoincrement())
+  name     String
+  students Student[]
+}
+
