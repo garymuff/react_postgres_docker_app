@@ -130,6 +130,41 @@ app.post('/students/:id', async (req, res) => {
   } 
 });
 
+// Update student grade for a class
+app.post('/classes/:classId/students/:studentId/grades', async (req, res) => {
+  const { classId, studentId } = req.params;
+  const { grade } = req.body;
+
+  try {
+    // Find the student by ID and update their grade for the specified class
+    const updatedStudent = await prisma.student.update({
+      where: {
+        id: parseInt(studentId),
+      },
+      data: {
+        classes: {
+          update: {
+            where: {
+              classId_studentId: {
+                classId: parseInt(classId),
+                studentId: parseInt(studentId),
+              },
+            },
+            data: {
+              grade: parseFloat(grade) || null,
+            },
+          },
+        },
+      },
+    });
+
+    res.json(updatedStudent);
+  } catch (error) {
+    console.error('Error updating student grade:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Enroll a student in a class
 // Modifies the _classToStudent Table in the database.
 
